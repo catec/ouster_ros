@@ -26,7 +26,7 @@ namespace sensor = ouster::sensor;
 
 void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::PacketsQueue<PacketMsg>>& queue,
                                sensor::sensor_info& info, const std::string& lidar_frame, const double stamp_offset,
-                               const double max_sync_diff)
+                               const double max_sync_diff, bool check_diff)
 {
    auto lidar_pub        = nh.advertise<sensor_msgs::PointCloud2>("points", 10);
    auto lidar_status_pub = nh.advertise<std_msgs::Header>("lidar_status", 10);
@@ -44,8 +44,9 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
 
    auto batch_and_publish = sensor::batch_to_iter<Cloud::iterator>(
        W, pf, {}, Point::get_from_pixel(xyz_lut, W, H), [&](std::chrono::nanoseconds scan_ts) mutable {
-          double delay = ouster_ros::cloud_to_cloud_msg(cloud, msg, scan_ts, lidar_frame, stamp_offset, max_sync_diff);
-          if (delay > max_sync_diff)
+          double delay =
+              ouster_ros::cloud_to_cloud_msg(cloud, msg, scan_ts, lidar_frame, stamp_offset, max_sync_diff, check_diff);
+          if (check_diff && delay > max_sync_diff)
           {
              ROS_WARN_STREAM("OS clock is not sync with host. Delay is: " << delay << " secs");
              return;
@@ -66,7 +67,7 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
 
 void imu_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::PacketsQueue<PacketMsg>>& queue,
                              sensor::sensor_info& info, const std::string& imu_frame, const double stamp_offset,
-                             const double max_sync_diff)
+                             const double max_sync_diff, bool check_diff)
 {
    auto lidar_pub = nh.advertise<sensor_msgs::PointCloud2>("points", 10);
 
@@ -77,8 +78,8 @@ void imu_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::Pa
       auto packet = queue->get();
 
       sensor_msgs::Imu msg;
-      double delay = ouster_ros::packet_to_imu_msg(packet, msg, imu_frame, pf, stamp_offset, max_sync_diff);
-      if (delay > max_sync_diff)
+      double delay = ouster_ros::packet_to_imu_msg(packet, msg, imu_frame, pf, stamp_offset, max_sync_diff, check_diff);
+      if (check_diff && delay > max_sync_diff)
       {
          ROS_WARN_STREAM("OS clock is not sync with host. Delay is: " << delay << " secs");
          return;
@@ -198,6 +199,9 @@ int main(int argc, char** argv)
    ROS_INFO("Using lidar_mode: %s", sensor::to_string(info.mode).c_str());
    ROS_INFO("%s sn: %s firmware rev: %s", info.prod_line.c_str(), info.sn.c_str(), info.fw_rev.c_str());
 
+   bool check_diff = false;
+   if (parameters.timestamp_mode == ouster::sensor::TIME_FROM_PTP_1588) check_diff = true;
+
    // Lidar
    tf2_ros::StaticTransformBroadcaster tf_bcast{};
 
@@ -209,7 +213,7 @@ int main(int argc, char** argv)
 
    std::unique_ptr<std::thread> lidar_processing_thread = std::make_unique<std::thread>(
        cloud_packages_processing, std::ref(nh), std::ref(lidar_queue), std::ref(info), std::ref(parameters.lidar_frame),
-       parameters.stamp_offset, parameters.max_sync_diff);
+       parameters.stamp_offset, parameters.max_sync_diff, check_diff);
 
    // Imu
    std::shared_ptr<ouster_ros::PacketsQueue<PacketMsg>> imu_queue;
@@ -223,9 +227,9 @@ int main(int argc, char** argv)
       std::shared_ptr<ouster_ros::PacketsQueue<PacketMsg>> imu_queue =
           std::make_shared<ouster_ros::PacketsQueue<PacketMsg>>("imu_queue", 512);
 
-      imu_processing_thread = std::make_unique<std::thread>(imu_packages_processing, std::ref(nh), std::ref(imu_queue),
-                                                            std::ref(info), std::ref(parameters.imu_frame),
-                                                            parameters.stamp_offset, parameters.max_sync_diff);
+      imu_processing_thread = std::make_unique<std::thread>(
+          imu_packages_processing, std::ref(nh), std::ref(imu_queue), std::ref(info), std::ref(parameters.imu_frame),
+          parameters.stamp_offset, parameters.max_sync_diff, check_diff);
    }
 
    auto res = connection_loop(*cli, info.format, lidar_queue, imu_queue, (bool)parameters.imu_port);

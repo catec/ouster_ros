@@ -29,7 +29,8 @@ bool read_lidar_packet(const sensor::client& cli, PacketMsg& m, const sensor::pa
 }
 
 double packet_to_imu_msg(const PacketMsg& p, sensor_msgs::Imu& imu_msg, const std::string& frame,
-                         const sensor::packet_format& pf, const double stamp_offset, const double max_sync_diff)
+                         const sensor::packet_format& pf, const double stamp_offset, const double max_sync_diff,
+                         bool check_diff)
 {
    const double standard_g = 9.80665;
    const uint8_t* buf      = p.buf.data();
@@ -40,7 +41,7 @@ double packet_to_imu_msg(const PacketMsg& p, sensor_msgs::Imu& imu_msg, const st
    auto now       = ros::Time::now();
    auto diff_time = now.toSec() - stamp_sec;
 
-   if (abs(diff_time) > max_sync_diff) return diff_time;
+   if (check_diff && abs(diff_time) > max_sync_diff) return diff_time;
 
    imu_msg.header.frame_id = frame;
 
@@ -73,7 +74,8 @@ double packet_to_imu_msg(const PacketMsg& p, sensor_msgs::Imu& imu_msg, const st
 }
 
 double cloud_to_cloud_msg(const Cloud& cloud, sensor_msgs::PointCloud2& cloud_msg, ns timestamp,
-                          const std::string& frame, const double stamp_offset, const double max_sync_diff)
+                          const std::string& frame, const double stamp_offset, const double max_sync_diff,
+                          bool check_diff)
 {
    cloud_msg.header.stamp.fromNSec(timestamp.count());
    auto stamp_sec = cloud_msg.header.stamp.toSec() + stamp_offset;
@@ -81,7 +83,7 @@ double cloud_to_cloud_msg(const Cloud& cloud, sensor_msgs::PointCloud2& cloud_ms
    auto now       = ros::Time::now();
    auto diff_time = now.toSec() - stamp_sec;
 
-   if (abs(diff_time) > max_sync_diff) return diff_time;
+   if (check_diff && abs(diff_time) > max_sync_diff) return diff_time;
 
    pcl::toROSMsg(cloud, cloud_msg);
    cloud_msg.header.stamp.fromSec(stamp_sec);

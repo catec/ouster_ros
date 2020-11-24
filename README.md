@@ -28,7 +28,7 @@ The motivation for creating this package is:
 * Possibility to inverse TF publication between /os_sensor and /os_lidar
 * Code-level check of the synchronization of published messages when setting up PTP
 
-If you are ok without these funtionalities, feel free to use the original [ouster_example](https://github.com/ouster-lidar/ouster_example) from Ouster.
+If you are ok without these functionalities, feel free to use the original [ouster_example](https://github.com/ouster-lidar/ouster_example) from Ouster.
 
 ## Requirements
 * Tested with [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu) on Ubuntu 18.04, but it may work with [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu) on Ubuntu 16.04 (untested) with some extra packages:
@@ -126,11 +126,13 @@ See [License](LICENSE)
 
 This code is distributed with the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of merchantability or fitness for a particular purpose. 
 
-All the credits to goes to the [Ouster](https://ouster.com/) team and their original repo [ouster_example](https://github.com/ouster-lidar/ouster_example) for establishing the basis of this project.
+All the credits go to the [Ouster](https://ouster.com/) team and their original repo [ouster_example](https://github.com/ouster-lidar/ouster_example) for establishing the basis of this project.
 
 ## Help / Contribution
 
 * Contact: **Rafael Caballero** (rcaballero@catec.aero)
+
+   ![FADA](./doc/FADA.png)    ![CATEC](./doc/CATEC.png)
 
 * Found a bug? Create an ISSUE!
 

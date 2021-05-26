@@ -10,6 +10,8 @@
 #include <string>
 #include <thread>
 
+#include <math.h>
+
 #include "ouster_ros/client/lidar_scan.h"
 #include "ouster_ros/client/packet.h"
 #include "ouster_ros/client/types.h"
@@ -46,7 +48,7 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
        W, pf, {}, Point::get_from_pixel(xyz_lut, W, H), [&](std::chrono::nanoseconds scan_ts) mutable {
           double delay =
               ouster_ros::cloud_to_cloud_msg(cloud, msg, scan_ts, lidar_frame, stamp_offset, max_sync_diff, check_diff);
-          if (check_diff && delay > max_sync_diff)
+          if (check_diff && fabs(delay) > max_sync_diff)
           {
              ROS_WARN_STREAM("OS clock is not sync with host. Delay is: " << delay << " secs");
              return;
@@ -79,7 +81,7 @@ void imu_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::Pa
 
       sensor_msgs::Imu msg;
       double delay = ouster_ros::packet_to_imu_msg(packet, msg, imu_frame, pf, stamp_offset, max_sync_diff, check_diff);
-      if (check_diff && delay > max_sync_diff)
+      if (check_diff && fabs(delay) > max_sync_diff)
       {
          ROS_WARN_STREAM("OS clock is not sync with host. Delay is: " << delay << " secs");
          return;

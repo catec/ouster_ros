@@ -37,8 +37,7 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
    uint32_t W = info.format.columns_per_frame;
    auto pf    = sensor::get_format(info.format);
 
-   // TODO: Create new method for obtaining xyz when encoder is in the mirror's range, also for azimuth
-   auto xyz_lut = ouster::make_xyz_lut(info);
+   auto xyz_lut = ouster::make_xyz_lut_mirror(info);
 
    Cloud cloud{W, H};
    auto it = cloud.begin();

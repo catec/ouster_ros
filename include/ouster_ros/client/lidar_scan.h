@@ -246,7 +246,7 @@ XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double ra
  */
 inline XYZLut make_xyz_lut_mirror(const sensor::sensor_info& sensor)
 {
-   return make_xyz_lut(sensor.format.columns_per_frame, sensor.format.pixels_per_column, sensor::range_unit,
+   return make_xyz_lut_mirror(sensor.format.columns_per_frame, sensor.format.pixels_per_column, sensor::range_unit,
                        sensor.lidar_origin_to_beam_origin_mm, sensor.beam_azimuth_angles, sensor.beam_altitude_angles);
 }
 

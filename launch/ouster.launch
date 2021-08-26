@@ -1,11 +1,11 @@
 <launch>
 
-   <arg name="sensor_hostname" default="10.5.0.113" doc="hostname or IP in dotted decimal form of the sensor"/>
+   <arg name="sensor_hostname" default="10.5.0.74" doc="hostname or IP in dotted decimal form of the sensor"/>
    <arg name="udp_dest"        default="10.5.0.1" doc="hostname or IP where the sensor will send data packets"/>
    <arg name="lidar_port"      default="7502" doc="port to which the sensor should send lidar data"/>
    <arg name="imu_port"        default="7503" doc="port to which the sensor should send imu data"/>
    <arg name="lidar_mode"      default="1024x10" doc="resolution and rate: either 512x10, 512x20, 1024x10, 1024x20, or 2048x10"/>
-   <arg name="timestamp_mode"  default="TIME_FROM_PTP_1588" doc="method used to timestamp measurements: TIME_FROM_INTERNAL_OSC, TIME_FROM_SYNC_PULSE_IN, TIME_FROM_PTP_1588"/>
+   <arg name="timestamp_mode"  default="TIME_FROM_INTERNAL_OSC" doc="method used to timestamp measurements: TIME_FROM_INTERNAL_OSC, TIME_FROM_SYNC_PULSE_IN, TIME_FROM_PTP_1588"/>
    <arg name="tf_prefix"       default="" doc="namespace for tf transforms"/>
    <arg name="tf_inverse"      default="true" doc="inverse tf os_sensor - os_lidar"/>
    <arg name="stamp_offset"    default="0.0" doc="timestamp (in secs) to be added"/>

@@ -33,7 +33,17 @@ struct EIGEN_ALIGN16 Point
       return [xyz_lut, w, h](std::ptrdiff_t u, std::ptrdiff_t v, std::chrono::nanoseconds ts,
                              std::chrono::nanoseconds scan_ts, uint32_t range, uint16_t intensity, uint16_t noise,
                              uint16_t reflectivity) -> Point {
-         const auto xyz = xyz_lut.direction.row(u * w + v) * range + xyz_lut.offset.row(u * w + v);
+         Eigen::Vector3d xyz_ = xyz_lut.direction.row(u * w + v) * range + xyz_lut.offset.row(u * w + v);
+         
+         if (range <= 0)
+         {
+            xyz_(0) = 0;
+            xyz_(1) = 0;
+            xyz_(2) = 0;
+         }
+
+         const auto xyz = xyz_;
+
          return {static_cast<float>(xyz(0)),          static_cast<float>(xyz(1)),
                  static_cast<float>(xyz(2)),          0.0f,
                  static_cast<float>(intensity),       static_cast<uint32_t>((ts - scan_ts).count()),

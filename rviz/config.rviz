@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /PointCloud21/Autocompute Value Bounds1
-        - /Axes1
       Splitter Ratio: 0.5
     Tree Height: 875
   - Class: rviz/Selection
@@ -119,25 +118,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 12.536316871643066
+      Distance: 13.520503044128418
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.30239275097846985
-        Y: -0.43706709146499634
-        Z: 0.24597066640853882
+        X: 0.5074222087860107
+        Y: 1.0222617387771606
+        Z: -0.25438496470451355
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.34979701042175293
+      Pitch: 0.20479537546634674
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.922276735305786
+      Yaw: 1.1083252429962158
     Saved: ~
 Window Geometry:
   Displays:

@@ -184,6 +184,7 @@ struct XYZLut
 {
    LidarScan::Points direction;
    LidarScan::Points offset;
+   std::vector<bool> mirror_reflexed;
 };
 
 /**

@@ -120,42 +120,23 @@ XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double ra
                lut.offset(i,0)    = v_offset(0);
                lut.offset(i,1)    = v_offset(1);
                lut.offset(i,2)    = v_offset(2);
+               continue;
             }
-            else
-            {
-               // Without mirrors
-               Eigen::Vector3d v_direction(cos(altitude) * cos(azimuth),-cos(altitude) * sin(azimuth),sin(altitude));
-               v_direction*= range_unit;
-               
-               lut.direction(i,0) = v_direction(0);
-               lut.direction(i,1) = v_direction(1);
-               lut.direction(i,2) = v_direction(2);
+         }  
+         // Without mirrors
+         Eigen::Vector3d v_direction(cos(altitude) * cos(azimuth),-cos(altitude) * sin(azimuth),sin(altitude));
+         v_direction*= range_unit;
+         
+         lut.direction(i,0) = v_direction(0);
+         lut.direction(i,1) = v_direction(1);
+         lut.direction(i,2) = v_direction(2);
 
-               Eigen::Vector3d v_offset(cos(azimuth) - v_direction(0),-sin(azimuth)- v_direction(1),- v_direction(2));
-               v_offset*= lidar_origin_to_beam_origin_m;
+         Eigen::Vector3d v_offset(cos(azimuth) - v_direction(0),-sin(azimuth)- v_direction(1),- v_direction(2));
+         v_offset*= lidar_origin_to_beam_origin_m;
 
-               lut.offset(i,0) = v_offset(0);
-               lut.offset(i,1) = v_offset(1);
-               lut.offset(i,2) = v_offset(2);
-            }
-         }
-         else
-         {     
-            // Without mirrors
-            Eigen::Vector3d v_direction(cos(altitude) * cos(azimuth),-cos(altitude) * sin(azimuth),sin(altitude));
-            v_direction*= range_unit;
-            
-            lut.direction(i,0) = v_direction(0);
-            lut.direction(i,1) = v_direction(1);
-            lut.direction(i,2) = v_direction(2);
-
-            Eigen::Vector3d v_offset(cos(azimuth) - v_direction(0),-sin(azimuth)- v_direction(1),- v_direction(2));
-            v_offset*= lidar_origin_to_beam_origin_m;
-
-            lut.offset(i,0) = v_offset(0);
-            lut.offset(i,1) = v_offset(1);
-            lut.offset(i,2) = v_offset(2); 
-         }
+         lut.offset(i,0) = v_offset(0);
+         lut.offset(i,1) = v_offset(1);
+         lut.offset(i,2) = v_offset(2); 
       }  
    }   
    return lut;

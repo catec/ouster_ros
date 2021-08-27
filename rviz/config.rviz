@@ -6,8 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /PointCloud21
         - /PointCloud21/Autocompute Value Bounds1
+        - /Axes1
       Splitter Ratio: 0.5
     Tree Height: 875
   - Class: rviz/Selection
@@ -84,6 +84,13 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 0.20000000298023224
+      Name: Axes
+      Radius: 0.029999999329447746
+      Reference Frame: <Fixed Frame>
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -112,25 +119,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.6463942527770996
+      Distance: 12.536316871643066
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.20784027874469757
-        Y: 0.037883780896663666
-        Z: 0.2540140748023987
+        X: 0.30239275097846985
+        Y: -0.43706709146499634
+        Z: 0.24597066640853882
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3597974181175232
+      Pitch: 0.34979701042175293
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.048598766326904
+      Yaw: 3.922276735305786
     Saved: ~
 Window Geometry:
   Displays:

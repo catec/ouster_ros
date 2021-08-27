@@ -42,14 +42,18 @@ XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double ra
                            double lidar_origin_to_beam_origin_mm, const std::vector<double>& azimuth_angles_deg,
                            const std::vector<double>& altitude_angles_deg)
 {
-   // Const Mirror Data
-   const double mirror_angle      = 45 * M_PI/ 180;
-   const double mirror_distance_m = 0.0525;
+   // Mirrors Data
+   const double mirror_angle      = 50 * M_PI/ 180;
+   const double mirror_distance_m = 0.051;
+   const double w_mirror_m = 0.088;
+   const double h_mirror_m = 0.120;
+   const double mirror_az_min  = 45  * M_PI / 180;
+   const double mirror_az_max  = 135 * M_PI / 180;
 
-   const double mirror_az_min  = 50  * M_PI / 180;
-   const double mirror_az_max  = 130 * M_PI / 180;
-   const double mirror_alt_min = -mirror_angle;
-   const double mirror_alt_max = mirror_angle;
+   const double x_mirror_min = -w_mirror_m/2.0;
+   const double x_mirror_max = w_mirror_m/2.0;
+   const double y_mirror_min = - mirror_distance_m - h_mirror_m*cos(mirror_angle);
+   const double y_mirror_max = - mirror_distance_m;
    
 
    const Eigen::Vector3d p_plane(0,-mirror_distance_m,0);
@@ -68,26 +72,9 @@ XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double ra
 
          LidarScan::index_t i = u*w + v;
 
-         // Without mirrors
-         if ( (azimuth < mirror_az_min) || (azimuth > mirror_az_max) || (altitude < mirror_alt_min) || (altitude > mirror_alt_max)) 
+         // Check if there are mirrors
+         if (azimuth > mirror_az_min && azimuth < mirror_az_max && altitude > -mirror_angle && altitude < mirror_angle)
          {
-            Eigen::Vector3d v_direction(cos(altitude) * cos(azimuth),-cos(altitude) * sin(azimuth),sin(altitude));
-            v_direction*= range_unit;
-            
-            lut.direction(i,0) = v_direction(0);
-            lut.direction(i,1) = v_direction(1);
-            lut.direction(i,2) = v_direction(2);
-
-            Eigen::Vector3d v_offset(cos(azimuth) - v_direction(0),-sin(azimuth)- v_direction(1),- v_direction(2));
-            v_offset*= lidar_origin_to_beam_origin_m;
-
-            lut.offset(i,0) = v_offset(0);
-            lut.offset(i,1) = v_offset(1);
-            lut.offset(i,2) = v_offset(2);
-         }
-         else // With mirrors
-         {
-         
             // Select mirror plane
             double z_n_direction = cos(mirror_angle);
             if (altitude < 0)
@@ -107,26 +94,67 @@ XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double ra
             Eigen::Vector3d v2;
             v2 = (n_plane.dot(p_plane-v1)/n_plane.dot(d2))*d2;
 
-            // Third section - Reflex direction
-            const double theta_r = acos(n_plane.dot(-d2));
-            Eigen::Vector3d n_reflex_plane;
-            Eigen::Vector3d d3;
-            n_reflex_plane = n_plane.cross(d2);
-            d3 = cos(theta_r)*n_plane + sin(theta_r)*n_reflex_plane.cross(n_plane);
-            d3.normalize();
-            d3 *= range_unit;
+            Eigen::Vector3d i_point;
+            i_point = v1 + v2;
 
-            // Offset
-            Eigen::Vector3d v_offset;
-            v_offset = v1 + v2 - d3*lidar_origin_to_beam_origin_m - d3 * v2.norm();
+            // Mirrors section            
+            if (i_point(0)>x_mirror_min && i_point(0)<x_mirror_max && i_point(1)>y_mirror_min && i_point(1)<y_mirror_max)
+            {
+               // Third section - Reflex direction
+               const double theta_r = acos(n_plane.dot(-d2));
+               Eigen::Vector3d n_reflex_plane;
+               Eigen::Vector3d d3;
+               n_reflex_plane = n_plane.cross(d2);
+               d3 = cos(theta_r)*n_plane + sin(theta_r)*n_reflex_plane.cross(n_plane);
+               d3.normalize();
+               d3 *= range_unit;
 
-            // Store data
-            lut.direction(i,0) = d3(0);
-            lut.direction(i,1) = d3(1);
-            lut.direction(i,2) = d3(2);
-            lut.offset(i,0)    = v_offset(0);
-            lut.offset(i,1)    = v_offset(1);
-            lut.offset(i,2)    = v_offset(2);
+               // Offset
+               Eigen::Vector3d v_offset;
+               v_offset = i_point - d3*lidar_origin_to_beam_origin_m - d3 * v2.norm();
+
+               // Store data
+               lut.direction(i,0) = d3(0);
+               lut.direction(i,1) = d3(1);
+               lut.direction(i,2) = d3(2);
+               lut.offset(i,0)    = v_offset(0);
+               lut.offset(i,1)    = v_offset(1);
+               lut.offset(i,2)    = v_offset(2);
+            }
+            else
+            {
+               // Without mirrors
+               Eigen::Vector3d v_direction(cos(altitude) * cos(azimuth),-cos(altitude) * sin(azimuth),sin(altitude));
+               v_direction*= range_unit;
+               
+               lut.direction(i,0) = v_direction(0);
+               lut.direction(i,1) = v_direction(1);
+               lut.direction(i,2) = v_direction(2);
+
+               Eigen::Vector3d v_offset(cos(azimuth) - v_direction(0),-sin(azimuth)- v_direction(1),- v_direction(2));
+               v_offset*= lidar_origin_to_beam_origin_m;
+
+               lut.offset(i,0) = v_offset(0);
+               lut.offset(i,1) = v_offset(1);
+               lut.offset(i,2) = v_offset(2);
+            }
+         }
+         else
+         {     
+            // Without mirrors
+            Eigen::Vector3d v_direction(cos(altitude) * cos(azimuth),-cos(altitude) * sin(azimuth),sin(altitude));
+            v_direction*= range_unit;
+            
+            lut.direction(i,0) = v_direction(0);
+            lut.direction(i,1) = v_direction(1);
+            lut.direction(i,2) = v_direction(2);
+
+            Eigen::Vector3d v_offset(cos(azimuth) - v_direction(0),-sin(azimuth)- v_direction(1),- v_direction(2));
+            v_offset*= lidar_origin_to_beam_origin_m;
+
+            lut.offset(i,0) = v_offset(0);
+            lut.offset(i,1) = v_offset(1);
+            lut.offset(i,2) = v_offset(2); 
          }
       }  
    }   

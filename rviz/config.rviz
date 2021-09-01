@@ -7,6 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /PointCloud21/Autocompute Value Bounds1
+        - /PointCloud22
+        - /PointCloud23
       Splitter Ratio: 0.5
     Tree Height: 875
   - Class: rviz/Selection
@@ -65,7 +67,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: AxisColor
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 6336
@@ -82,13 +84,73 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Class: rviz/Axes
       Enabled: true
       Length: 0.20000000298023224
       Name: Axes
       Radius: 0.029999999329447746
       Reference Frame: <Fixed Frame>
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 239; 41; 41
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Spheres
+      Topic: /os_node/mirror_points
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: false
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: z
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 2
+      Min Color: 0; 0; 0
+      Min Intensity: -2
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Spheres
+      Topic: /os_node/non_mirror_points
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
       Value: true
   Enabled: true
   Global Options:
@@ -118,25 +180,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 13.520503044128418
+      Distance: 7.969808101654053
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.5074222087860107
-        Y: 1.0222617387771606
-        Z: -0.25438496470451355
+        X: 0.04533679783344269
+        Y: -0.788621723651886
+        Z: 1.4839507341384888
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.20479537546634674
+      Pitch: -0.020204607397317886
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.1083252429962158
+      Yaw: 0.9470070004463196
     Saved: ~
 Window Geometry:
   Displays:

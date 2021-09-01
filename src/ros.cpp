@@ -91,6 +91,26 @@ double cloud_to_cloud_msg(const Cloud& cloud, sensor_msgs::PointCloud2& cloud_ms
    return diff_time;
 }
 
+double indices_to_indices_msg(const std::vector<uint32_t>& indices, MirrorIndicesMsg& indices_msg, ns timestamp,
+                              const std::string& frame, const double stamp_offset, const double max_sync_diff,
+                              bool check_diff)
+{
+   indices_msg.header.stamp.fromNSec(timestamp.count());
+   auto stamp_sec = indices_msg.header.stamp.toSec() + stamp_offset;
+
+   auto now       = ros::Time::now();
+   auto diff_time = now.toSec() - stamp_sec;
+
+   if (check_diff && abs(diff_time) > max_sync_diff) return diff_time;
+
+   indices_msg.header.stamp.fromSec(stamp_sec);
+   indices_msg.header.frame_id = frame;
+
+   indices_msg.indices = indices;
+
+   return diff_time;
+}
+
 geometry_msgs::TransformStamped transform_to_tf_msg(const std::vector<double>& mat, const std::string& frame,
                                                     const std::string& child_frame, bool inverse)
 {

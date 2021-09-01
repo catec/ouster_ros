@@ -25,7 +25,7 @@ set(CMAKE_CXX_STANDARD 14)
 add_compile_options(-Wall -Wextra)
 
 # ==== Catkin ====
-add_message_files(FILES PacketMsg.msg)
+add_message_files(FILES PacketMsg.msg MirrorIndicesMsg.msg)
 generate_messages(DEPENDENCIES std_msgs sensor_msgs geometry_msgs)
 
 catkin_package(
@@ -68,6 +68,11 @@ add_executable(os_node src/os_node.cpp)
 target_link_libraries(os_node ouster_ros ${catkin_LIBRARIES})
 target_include_directories(os_node PRIVATE include ${catkin_INCLUDE_DIRS})
 add_dependencies(os_node ${PROJECT_NAME}_gencpp)
+
+add_executable(os_split_cloud_node src/os_split_cloud_node.cpp)
+target_link_libraries(os_split_cloud_node ouster_ros ${catkin_LIBRARIES})
+target_include_directories(os_split_cloud_node PRIVATE include ${catkin_INCLUDE_DIRS})
+add_dependencies(os_split_cloud_node ${PROJECT_NAME}_gencpp)
 
 add_executable(os_img_node src/os_img_node.cpp)
 target_link_libraries(os_img_node ouster_ros ${catkin_LIBRARIES})

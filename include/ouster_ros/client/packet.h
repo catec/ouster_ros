@@ -14,6 +14,8 @@
 #include "ouster_ros/client/impl/packet_impl.h"
 #include "ouster_ros/client/types.h"
 
+#include <iostream>
+
 namespace ouster
 {
 namespace sensor
@@ -58,7 +60,7 @@ constexpr packet_format packet__1_14_0__128 = impl::packet__1_14_0<128>();
  * which data is added for every point in the scan.
  */
 template <typename iterator_type, typename F, typename C>
-std::function<void(const uint8_t*, iterator_type it)> batch_to_iter(
+std::function<void(const uint8_t*, iterator_type it, std::vector<uint32_t> &mirror_indices)> batch_to_iter(
     int w, const packet_format& pf, const typename std::iterator_traits<iterator_type>::value_type& empty, C&& c, F&& f)
 {
    int h = pf.pixels_per_column;
@@ -68,7 +70,7 @@ std::function<void(const uint8_t*, iterator_type it)> batch_to_iter(
    constexpr std::chrono::nanoseconds invalid_ts(-1LL);
    std::chrono::nanoseconds scan_ts(invalid_ts);
 
-   return [=](const uint8_t* packet_buf, iterator_type it) mutable {
+   return [=](const uint8_t* packet_buf, iterator_type it, std::vector<uint32_t> &mirror_indices) mutable {
       for (int icol = 0; icol < pf.columns_per_packet; icol++)
       {
          const uint8_t* col_buf = pf.nth_col(icol, packet_buf);
@@ -109,10 +111,16 @@ std::function<void(const uint8_t*, iterator_type it)> batch_to_iter(
          for (uint8_t ipx = 0; ipx < h; ipx++)
          {
             const uint8_t* px_buf = pf.nth_px(ipx, col_buf);
+            bool mirror_point;
 
             // i, ts, reflectivity, ring, noise, range (mm)
             it[idx + ipx] = c(ipx, m_id, ts, scan_ts, pf.px_range(px_buf), pf.px_signal_photons(px_buf),
-                              pf.px_noise_photons(px_buf), pf.px_reflectivity(px_buf));
+                                    pf.px_noise_photons(px_buf), pf.px_reflectivity(px_buf),mirror_point);     
+            if (mirror_point)
+            {
+               mirror_indices.push_back(idx + ipx);
+            }
+
          }
       }
    };

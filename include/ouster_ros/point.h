@@ -11,6 +11,8 @@
 #include <chrono>
 #include <functional>
 
+#include <std_msgs/Int32.h>
+
 #include "ouster_ros/client/lidar_scan.h"
 
 namespace ouster_ros
@@ -27,12 +29,12 @@ struct EIGEN_ALIGN16 Point
    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
    static inline std::function<Point(std::ptrdiff_t, std::ptrdiff_t, std::chrono::nanoseconds, std::chrono::nanoseconds,
-                                     uint32_t, uint16_t, uint16_t, uint16_t)>
+                                     uint32_t, uint16_t, uint16_t, uint16_t, bool &)>
    get_from_pixel(const ouster::XYZLut& xyz_lut, size_t w, size_t h)
    {
       return [xyz_lut, w, h](std::ptrdiff_t u, std::ptrdiff_t v, std::chrono::nanoseconds ts,
                              std::chrono::nanoseconds scan_ts, uint32_t range, uint16_t intensity, uint16_t noise,
-                             uint16_t reflectivity) -> Point {
+                             uint16_t reflectivity, bool &mirror_point) -> Point {
          Eigen::Vector3d xyz_ = xyz_lut.direction.row(u * w + v) * range + xyz_lut.offset.row(u * w + v);
          
          if (range <= 0)
@@ -43,6 +45,8 @@ struct EIGEN_ALIGN16 Point
          }
 
          const auto xyz = xyz_;
+
+         mirror_point = xyz_lut.mirror_reflexed[u * w + v];
 
          return {static_cast<float>(xyz(0)),          static_cast<float>(xyz(1)),
                  static_cast<float>(xyz(2)),          0.0f,

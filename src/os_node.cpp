@@ -30,8 +30,9 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
                                sensor::sensor_info& info, const std::string& lidar_frame, const double stamp_offset,
                                const double max_sync_diff, bool check_diff)
 {
-   auto lidar_pub        = nh.advertise<sensor_msgs::PointCloud2>("points", 10);
-   auto lidar_status_pub = nh.advertise<std_msgs::Header>("lidar_status", 10);
+   auto lidar_pub          = nh.advertise<sensor_msgs::PointCloud2>("points", 10);
+   auto lidar_status_pub   = nh.advertise<std_msgs::Header>("lidar_status", 10);
+   auto mirror_indices_pub = nh.advertise<ouster_ros::MirrorIndicesMsg>("mirror_indices", 10);
 
    uint32_t H = info.format.pixels_per_column;
    uint32_t W = info.format.columns_per_frame;
@@ -42,19 +43,27 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
    Cloud cloud{W, H};
    auto it = cloud.begin();
    sensor_msgs::PointCloud2 msg{};
+
+   std::vector<uint32_t> mirror_indices;
+   ouster_ros::MirrorIndicesMsg mirror_indices_msg{};
+
    std_msgs::Header status_msg;
 
    auto batch_and_publish = sensor::batch_to_iter<Cloud::iterator>(
        W, pf, {}, Point::get_from_pixel(xyz_lut, W, H), [&](std::chrono::nanoseconds scan_ts) mutable {
           double delay =
               ouster_ros::cloud_to_cloud_msg(cloud, msg, scan_ts, lidar_frame, stamp_offset, max_sync_diff, check_diff);
+          double delay_ind = ouster_ros::indices_to_indices_msg(mirror_indices, mirror_indices_msg, scan_ts,
+                                                                lidar_frame, stamp_offset, max_sync_diff, check_diff);
+
           if (check_diff && fabs(delay) > max_sync_diff)
           {
              ROS_WARN_STREAM("OS clock is not sync with host. Delay is: " << delay << " secs");
              return;
           }
-
+          mirror_indices_pub.publish(mirror_indices_msg);
           lidar_pub.publish(msg);
+          mirror_indices.clear();
 
           status_msg = msg.header;
           lidar_status_pub.publish(status_msg);
@@ -63,7 +72,7 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
    while (ros::ok())
    {
       auto packet = queue->get();
-      batch_and_publish(packet.buf.data(), it);
+      batch_and_publish(packet.buf.data(), it, mirror_indices);
    }
 }
 

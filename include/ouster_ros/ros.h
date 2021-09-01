@@ -19,6 +19,8 @@
 #include "ouster_ros/PacketMsg.h"
 #include "ouster_ros/point.h"
 
+#include "ouster_ros/MirrorIndicesMsg.h"
+
 namespace ouster_ros
 {
 namespace sensor = ouster::sensor;
@@ -63,6 +65,10 @@ double packet_to_imu_msg(const PacketMsg& pm, sensor_msgs::Imu& imu_msg, const s
 double cloud_to_cloud_msg(const Cloud& cloud, sensor_msgs::PointCloud2& cloud_msg, ns timestamp,
                           const std::string& frame, const double stamp_offset, const double max_sync_diff,
                           bool check_diff);
+
+double indices_to_indices_msg(const std::vector<uint32_t>& indices, MirrorIndicesMsg &indices_msg, ns timestamp,
+                              const std::string& frame, const double stamp_offset, const double max_sync_diff,
+                              bool check_diff);
 
 /**
  * Convert transformation matrix return by sensor to ROS transform

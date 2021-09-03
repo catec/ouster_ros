@@ -18,7 +18,9 @@ find_package(
              roscpp
              tf2
              tf2_ros
-             tf2_geometry_msgs)
+             tf2_geometry_msgs
+             eigen_conversions
+             visualization_msgs)
 
 # ==== Options ====
 set(CMAKE_CXX_STANDARD 14)
@@ -39,7 +41,9 @@ catkin_package(
   pcl_ros
   std_msgs
   sensor_msgs
-  geometry_msgs)
+  geometry_msgs
+  visualization_msgs
+  eigen_conversions)
 
 # ==== Libraries ====
 add_library(ouster_ros
@@ -50,8 +54,8 @@ add_library(ouster_ros
   src/client/client.cpp
   src/client/compat.cpp
   src/client/lidar_scan.cpp
-  src/client/types.cpp)
-
+  src/client/types.cpp
+  )
 target_link_libraries(
   ouster_ros
   PUBLIC ${catkin_LIBRARIES})
@@ -63,6 +67,14 @@ target_compile_options(ouster_ros
 target_compile_options(ouster_ros PRIVATE "${FLAGS}")
 add_dependencies(ouster_ros ${PROJECT_NAME}_gencpp)
 
+file(GLOB_RECURSE MIR_SRCS "src/mirror_markers.cpp" "src/os_split_cloud_node.cpp")
+file(GLOB_RECURSE MIR_HDRS "src/mirror_markers.h" "src/mirror_markers.h")
+add_library(mirrors_markers ${MIR_SRCS} ${MIR_HDRS})
+add_dependencies(mirrors_markers ${catkin_EXPORTED_TARGETS})
+target_link_libraries(mirrors_markers  PUBLIC ${catkin_LIBRARIES})
+set_target_properties(mirrors_markers PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(mirrors_markers PUBLIC include ${catkin_INCLUDE_DIRS})
+
 # ==== Executables ====
 add_executable(os_node src/os_node.cpp)
 target_link_libraries(os_node ouster_ros ${catkin_LIBRARIES})
@@ -70,9 +82,9 @@ target_include_directories(os_node PRIVATE include ${catkin_INCLUDE_DIRS})
 add_dependencies(os_node ${PROJECT_NAME}_gencpp)
 
 add_executable(os_split_cloud_node src/os_split_cloud_node.cpp)
-target_link_libraries(os_split_cloud_node ouster_ros ${catkin_LIBRARIES})
+target_link_libraries(os_split_cloud_node ${catkin_LIBRARIES} mirrors_markers)
 target_include_directories(os_split_cloud_node PRIVATE include ${catkin_INCLUDE_DIRS})
-add_dependencies(os_split_cloud_node ${PROJECT_NAME}_gencpp)
+add_dependencies(os_split_cloud_node ${catkin_EXPORTED_TARGETS})
 
 add_executable(os_img_node src/os_img_node.cpp)
 target_link_libraries(os_img_node ouster_ros ${catkin_LIBRARIES})

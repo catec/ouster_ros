@@ -21,6 +21,8 @@
    <build_depend>tf2</build_depend>
    <build_depend>tf2_ros</build_depend>
    <build_depend>tf2_geometry_msgs</build_depend>
+   <build_depend>eigen_conversions</build_depend>
+   <build_depend>visualization_msgs</build_depend>
 
    <exec_depend>libjsoncpp</exec_depend>
    <exec_depend>roscpp</exec_depend>
@@ -30,5 +32,9 @@
    <exec_depend>geometry_msgs</exec_depend>
    <exec_depend>pcl_ros</exec_depend>
    <exec_depend>pcl_conversions</exec_depend>
+   <exec_depend>eigen_conversions</exec_depend>
+   <exec_depend>visualization_msgs</exec_depend>
+
+   
    <export></export>
 </package>

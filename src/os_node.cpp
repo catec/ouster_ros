@@ -53,8 +53,8 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
        W, pf, {}, Point::get_from_pixel(xyz_lut, W, H), [&](std::chrono::nanoseconds scan_ts) mutable {
           double delay =
               ouster_ros::cloud_to_cloud_msg(cloud, msg, scan_ts, lidar_frame, stamp_offset, max_sync_diff, check_diff);
-          double delay_ind = ouster_ros::indices_to_indices_msg(mirror_indices, mirror_indices_msg, scan_ts,
-                                                                lidar_frame, stamp_offset, max_sync_diff, check_diff);
+          ouster_ros::indices_to_indices_msg(mirror_indices, mirror_indices_msg, scan_ts, lidar_frame, stamp_offset,
+                                             max_sync_diff, check_diff);
 
           if (check_diff && fabs(delay) > max_sync_diff)
           {

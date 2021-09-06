@@ -9,8 +9,8 @@
 
 #include "mirror_type.h"
 
-// namespace ouster
-// {
+namespace ouster_rviz
+{
 class MirrorMarkers
 {
   public:
@@ -49,6 +49,6 @@ class MirrorMarkers
                            visualization_msgs::Marker &faces_marker);
 };
 
-// }  // namespace ouster
+}  // namespace ouster_rviz
 
 #endif

@@ -19,7 +19,7 @@ std::vector<int> indices;
 ros::Publisher pub_mirror_points;
 ros::Publisher pub_non_mirror_points;
 ros::Publisher pub_markers;
-std::shared_ptr<MirrorMarkers> mirror_markers;
+std::shared_ptr<ouster_rviz::MirrorMarkers> mirror_markers;
 
 void indicesCallBack(ouster_ros::MirrorIndicesMsgConstPtr indices_msg)
 {
@@ -83,14 +83,15 @@ int main(int argc, char** argv)
    const double h_mirror_m        = 0.110;  // 0.120
    //[[]]
 
-   mirror_markers = std::make_shared<MirrorMarkers>(mirror_angle, mirror_distance_m, w_mirror_m, h_mirror_m);
+   mirror_markers =
+       std::make_shared<ouster_rviz::MirrorMarkers>(mirror_angle, mirror_distance_m, w_mirror_m, h_mirror_m);
 
-   mirror_markers->computeMirror(MirrorType::UP);
+   mirror_markers->computeMirror(ouster_rviz::MirrorType::UP);
    mirror_markers->addCornersMarkers();
    mirror_markers->addLinesMarkers();
    mirror_markers->addPlanesMarkers();
 
-   mirror_markers->computeMirror(MirrorType::DOWN);
+   mirror_markers->computeMirror(ouster_rviz::MirrorType::DOWN);
    mirror_markers->addCornersMarkers();
    mirror_markers->addLinesMarkers();
    mirror_markers->addPlanesMarkers();
@@ -99,9 +100,8 @@ int main(int argc, char** argv)
    pub_non_mirror_points = nh.advertise<sensor_msgs::PointCloud2>("/os_node/non_mirror_points", 10);
    pub_markers           = nh.advertise<visualization_msgs::MarkerArray>("/os_node/mirror_markers", 10);
 
-   ros::Subscriber sub_indices =
-       nh.subscribe("/os_node/mirror_indices", 1, indicesCallBack);                // /os_node/mirror_indices
-   ros::Subscriber sub_poins = nh.subscribe("/os_node/points", 1, cloudCallBack);  // /os_node/points
+   ros::Subscriber sub_indices = nh.subscribe("/os_node/mirror_indices", 1, indicesCallBack);
+   ros::Subscriber sub_poins   = nh.subscribe("/os_node/points", 1, cloudCallBack);
 
    ros::spin();
 }

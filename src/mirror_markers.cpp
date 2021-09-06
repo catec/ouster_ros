@@ -1,6 +1,7 @@
 #include "mirror_markers.h"
-// namespace ouster
-// {
+
+namespace ouster_rviz
+{
 MirrorMarkers::MirrorMarkers(const double &mirror_angle, const double &mirror_distance_m, const double &w_mirror_m,
                              const double &h_mirror_m)
 {
@@ -163,4 +164,4 @@ void MirrorMarkers::computePlanes()
    appendTriangleFace(_corners[0], _corners[2], _corners[1], _planes_markers);
    appendTriangleFace(_corners[1], _corners[2], _corners[3], _planes_markers);
 }
-// }  // namespace ouster
+}  // namespace ouster_rviz

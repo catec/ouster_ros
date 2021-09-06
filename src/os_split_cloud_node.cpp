@@ -88,18 +88,20 @@ int main(int argc, char** argv)
    mirror_markers->computeMirror(MirrorType::UP);
    mirror_markers->addCornersMarkers();
    mirror_markers->addLinesMarkers();
+   mirror_markers->addPlanesMarkers();
 
    mirror_markers->computeMirror(MirrorType::DOWN);
    mirror_markers->addCornersMarkers();
    mirror_markers->addLinesMarkers();
+   mirror_markers->addPlanesMarkers();
 
    pub_mirror_points     = nh.advertise<sensor_msgs::PointCloud2>("/os_node/mirror_points", 10);
    pub_non_mirror_points = nh.advertise<sensor_msgs::PointCloud2>("/os_node/non_mirror_points", 10);
    pub_markers           = nh.advertise<visualization_msgs::MarkerArray>("/os_node/mirror_markers", 10);
 
    ros::Subscriber sub_indices =
-       nh.subscribe("/os_node/mirror_indices", 1, indicesCallBack);           // /os_node/mirror_indices
-   ros::Subscriber sub_poins = nh.subscribe("/cloud_pcd", 1, cloudCallBack);  // /os_node/points
+       nh.subscribe("/os_node/mirror_indices", 1, indicesCallBack);                // /os_node/mirror_indices
+   ros::Subscriber sub_poins = nh.subscribe("/os_node/points", 1, cloudCallBack);  // /os_node/points
 
    ros::spin();
 }

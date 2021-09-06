@@ -25,11 +25,22 @@ MirrorMarkers::MirrorMarkers(const double &mirror_angle, const double &mirror_di
    _lines_markers.ns                 = "/mirror_markers";
    _lines_markers.pose.orientation.w = 1.0;
    _lines_markers.scale.x            = 0.005;
-   _corners_markers.scale.y          = 0.005;
    _lines_markers.color.a            = 1.0;
    _lines_markers.color.r            = 0.8;
    _lines_markers.color.g            = 0.8;
    _lines_markers.color.b            = 0.8;
+
+   _planes_markers.type               = visualization_msgs::Marker::TRIANGLE_LIST;
+   _planes_markers.action             = visualization_msgs::Marker::MODIFY;
+   _planes_markers.ns                 = "/mirror_markers";
+   _planes_markers.pose.orientation.w = 1.0;
+   _planes_markers.scale.x            = 1.0;
+   _planes_markers.scale.y            = 1.0;
+   _planes_markers.scale.z            = 1.0;
+   _planes_markers.color.a            = 1.0;
+   _planes_markers.color.r            = 0.3;
+   _planes_markers.color.g            = 0.3;
+   _planes_markers.color.b            = 0.8;
 }
 
 MirrorMarkers::~MirrorMarkers() {}
@@ -38,6 +49,7 @@ void MirrorMarkers::computeMirror(MirrorType mirror_type)
 {
    _mirror_type = mirror_type;
 
+   _corners.clear();
    _corners_markers.points.clear();
    _lines_markers.points.clear();
    _planes_markers.points.clear();
@@ -47,6 +59,8 @@ void MirrorMarkers::computeMirror(MirrorType mirror_type)
 
    for (uint i = 0; i < _lines_points.size(); i++) _corners_markers.points.push_back(_lines_points[i]);
    for (uint i = 0; i < _lines_points.size(); i++) _lines_markers.points.push_back(_lines_points[i]);
+
+   computePlanes();
 }
 
 void MirrorMarkers::addCornersMarkers()
@@ -105,6 +119,18 @@ std::vector<geometry_msgs::Point> MirrorMarkers::cornersToLines(const std::vecto
    return lines_face;
 }
 
+void MirrorMarkers::appendTriangleFace(Eigen::Vector3f first_corner, Eigen::Vector3f second_corner,
+                                       Eigen::Vector3f third_corner, visualization_msgs::Marker &faces_marker)
+{
+   geometry_msgs::Point triang_corner_1, triang_corner_2, triang_corner_3;
+   tf::pointEigenToMsg(first_corner.cast<double>(), triang_corner_1);
+   faces_marker.points.push_back(triang_corner_1);
+   tf::pointEigenToMsg(second_corner.cast<double>(), triang_corner_2);
+   faces_marker.points.push_back(triang_corner_2);
+   tf::pointEigenToMsg(third_corner.cast<double>(), triang_corner_3);
+   faces_marker.points.push_back(triang_corner_3);
+}
+
 void MirrorMarkers::computeCorners()
 {
    Eigen::Vector3f x_vector(1, 0, 0);
@@ -130,5 +156,11 @@ void MirrorMarkers::computeCorners()
       _corners.push_back(-y_vector * _mirror_distance_m + x_vector * _w_mirror_m / 2.0);
       _corners.push_back(-y_vector * _mirror_distance_m - x_vector * _w_mirror_m / 2.0);
    }
+}
+
+void MirrorMarkers::computePlanes()
+{
+   appendTriangleFace(_corners[0], _corners[2], _corners[1], _planes_markers);
+   appendTriangleFace(_corners[1], _corners[2], _corners[3], _planes_markers);
 }
 // }  // namespace ouster

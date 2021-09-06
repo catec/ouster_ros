@@ -43,7 +43,10 @@ class MirrorMarkers
    visualization_msgs::MarkerArray _markers;
 
    void computeCorners();
+   void computePlanes();
    std::vector<geometry_msgs::Point> cornersToLines(const std::vector<Eigen::Vector3f> &face_corners);
+   void appendTriangleFace(Eigen::Vector3f first_corner, Eigen::Vector3f second_corner, Eigen::Vector3f third_corner,
+                           visualization_msgs::Marker &faces_marker);
 };
 
 // }  // namespace ouster

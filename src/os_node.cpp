@@ -38,7 +38,22 @@ void cloud_packages_processing(ros::NodeHandle& nh, std::shared_ptr<ouster_ros::
    uint32_t W = info.format.columns_per_frame;
    auto pf    = sensor::get_format(info.format);
 
-   auto xyz_lut = ouster::make_xyz_lut_mirror(info);
+   XmlRpc::XmlRpcValue up_x, up_y, up_z;
+   nh.param("/up_mirror_points_x", up_x, up_x);
+   nh.param("/up_mirror_points_y", up_y, up_y);
+   nh.param("/up_mirror_points_z", up_z, up_z);
+
+   XmlRpc::XmlRpcValue down_x, down_y, down_z;
+   nh.param("/down_mirror_points_x", down_x, down_x);
+   nh.param("/down_mirror_points_y", down_y, down_y);
+   nh.param("/down_mirror_points_z", down_z, down_z);
+
+   std::vector<Eigen::Vector3d> up_points;
+   std::vector<Eigen::Vector3d> down_points;
+   for (int i = 0; i < up_x.size(); i++) up_points.push_back(Eigen::Vector3d(up_x[i], up_y[i], up_z[i]));
+   for (int i = 0; i < down_x.size(); i++) down_points.push_back(Eigen::Vector3d(down_x[i], down_y[i], down_z[i]));
+
+   auto xyz_lut = ouster::make_xyz_lut_mirror(info, up_points, down_points);
 
    Cloud cloud{W, H};
    auto it = cloud.begin();

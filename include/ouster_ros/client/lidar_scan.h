@@ -237,18 +237,22 @@ inline XYZLut make_xyz_lut(const sensor::sensor_info& sensor)
  * @return xyz direction unit vectors for each point in the lidar scan
  */
 XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double range_unit,
-                    double lidar_origin_to_beam_origin_mm, const std::vector<double>& azimuth_angles_deg,
-                    const std::vector<double>& altitude_angles_deg);
+                           double lidar_origin_to_beam_origin_mm, const std::vector<double>& azimuth_angles_deg,
+                           const std::vector<double>& altitude_angles_deg,
+                           std::vector<Eigen::Vector3d> up_mirror_points,
+                           std::vector<Eigen::Vector3d> down_mirror_points);
 
 /**
  * Convenient overload that uses parameters from the supplied sensor_info
  * @param sensor metadata returned from the client
  * @return xyz direction unit vectors for each point in the lidar scan
  */
-inline XYZLut make_xyz_lut_mirror(const sensor::sensor_info& sensor)
+inline XYZLut make_xyz_lut_mirror(const sensor::sensor_info& sensor, std::vector<Eigen::Vector3d> up_mirror_points,
+                                  std::vector<Eigen::Vector3d> down_mirror_points)
 {
    return make_xyz_lut_mirror(sensor.format.columns_per_frame, sensor.format.pixels_per_column, sensor::range_unit,
-                       sensor.lidar_origin_to_beam_origin_mm, sensor.beam_azimuth_angles, sensor.beam_altitude_angles);
+                              sensor.lidar_origin_to_beam_origin_mm, sensor.beam_azimuth_angles,
+                              sensor.beam_altitude_angles, up_mirror_points, down_mirror_points);
 }
 
 /**

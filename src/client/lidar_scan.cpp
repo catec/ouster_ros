@@ -40,22 +40,38 @@ XYZLut make_xyz_lut(LidarScan::index_t w, LidarScan::index_t h, double range_uni
 
 XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double range_unit,
                            double lidar_origin_to_beam_origin_mm, const std::vector<double>& azimuth_angles_deg,
-                           const std::vector<double>& altitude_angles_deg)
+                           const std::vector<double>& altitude_angles_deg,
+                           std::vector<Eigen::Vector3d> up_mirror_points,
+                           std::vector<Eigen::Vector3d> down_mirror_points)
 {
-   // Mirrors Data
-   const double mirror_angle      = 50 * M_PI / 180;
-   const double mirror_distance_m = 0.051;  // 0.0525
-   const double w_mirror_m        = 0.080;  // 0.088
-   const double h_mirror_m        = 0.110;  // 0.120
-   const double mirror_az_min     = 45 * M_PI / 180;
-   const double mirror_az_max     = 135 * M_PI / 180;
+   // Aproximate mirror interval
+   const double mirror_az_min = 45 * M_PI / 180;
+   const double mirror_az_max = 135 * M_PI / 180;
 
-   const double x_mirror_min = -w_mirror_m / 2.0;
-   const double x_mirror_max = w_mirror_m / 2.0;
-   const double y_mirror_min = -mirror_distance_m - h_mirror_m * cos(mirror_angle);
-   const double y_mirror_max = -mirror_distance_m;
+   // const double mirror_angle      = 50 * M_PI / 180;
+   // const double mirror_distance_m = 0.051;  // 0.0525
+   // const double w_mirror_m        = 0.080;  // 0.088
+   // const double h_mirror_m        = 0.110;  // 0.120
 
-   const Eigen::Vector3d p_plane(0, -mirror_distance_m, 0);
+   // const double x_mirror_min = -w_mirror_m / 2.0;
+   // const double x_mirror_max = w_mirror_m / 2.0;
+   // const double y_mirror_min = -mirror_distance_m - h_mirror_m * cos(mirror_angle);
+   // const double y_mirror_max = -mirror_distance_m;
+
+   // Extract plane data
+   Eigen::Vector3d v1_plane_up, v2_plane_up, n_plane_up, p_plane_up;
+   v1_plane_up = up_mirror_points[1] - up_mirror_points[0];
+   v2_plane_up = up_mirror_points[2] - up_mirror_points[1];
+   n_plane_up  = v1_plane_up.cross(v2_plane_up);
+   p_plane_up  = up_mirror_points[0];
+   n_plane_up.normalize();
+
+   Eigen::Vector3d v1_plane_down, v2_plane_down, n_plane_down, p_plane_down;
+   v1_plane_down = down_mirror_points[1] - down_mirror_points[0];
+   v2_plane_down = down_mirror_points[2] - down_mirror_points[1];
+   n_plane_down  = v1_plane_down.cross(v2_plane_down);
+   p_plane_down  = down_mirror_points[0];
+   n_plane_down.normalize();
 
    XYZLut lut;
    lut.direction = LidarScan::Points{w * h, 3};
@@ -73,14 +89,23 @@ XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double ra
          LidarScan::index_t i = u * w + v;
 
          // Check if there are mirrors
-         if (azimuth > mirror_az_min && azimuth < mirror_az_max && altitude > -mirror_angle && altitude < mirror_angle)
+         if (azimuth > mirror_az_min && azimuth < mirror_az_max)
          {
             // Select mirror plane
-            double z_n_direction = cos(mirror_angle);
-            if (altitude < 0) z_n_direction *= -1;
-
-            Eigen::Vector3d n_plane(0, sin(mirror_angle), z_n_direction);
-            n_plane.normalize();
+            Eigen::Vector3d n_plane, p_plane;
+            std::vector<Eigen::Vector3d> points;
+            if (altitude < 0)
+            {
+               p_plane = p_plane_down;
+               n_plane = n_plane_down;
+               points  = down_mirror_points;
+            }
+            else
+            {
+               p_plane = p_plane_up;
+               n_plane = n_plane_up;
+               points  = up_mirror_points;
+            }
 
             // First beam section - Horizontal stage
             Eigen::Vector3d v1(cos(azimuth), -sin(azimuth), 0);
@@ -96,9 +121,35 @@ XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double ra
             Eigen::Vector3d i_point;
             i_point = v1 + v2;
 
+            // Check if i_point is in the mirror section ( (x,y) inside projection of 4 lines )
+            // Make lineal clasifiers
+            std::vector<Eigen::Vector3d> w_lines;
+            points.push_back(points[0]);
+            for (uint i = 0; i < points.size() - 1; i++)
+            {
+               Eigen::Vector2d p1(points[i](0), points[i](1));
+               Eigen::Vector2d p2(points[i + 1](0), points[i + 1](1));
+
+               Eigen::Vector2d v_line;
+               v_line = p2 - p1;
+               v_line.normalize();
+
+               Eigen::Vector2d n_line(v_line(1), -v_line(0));
+               double rho = p1.dot(n_line);
+               Eigen::Vector3d w(n_line(0), n_line(1), -rho);
+
+               w_lines.push_back(w);
+            }
+
+            // Clasify
+            uint inside = 0;
+            Eigen::Vector3d i_data(i_point(0), i_point(1), 1);
+
+            for (uint i = 0; i < w_lines.size(); i++)
+               if (w_lines[i].dot(i_data) > 0) inside++;
+
             // Mirrors section
-            if (i_point(0) > x_mirror_min && i_point(0) < x_mirror_max && i_point(1) > y_mirror_min &&
-                i_point(1) < y_mirror_max)
+            if (inside == w_lines.size())
             {
                // Third section - Reflex direction
                const double theta_r = acos(n_plane.dot(-d2));

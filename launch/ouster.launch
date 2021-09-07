@@ -14,7 +14,16 @@
    <arg name="stamp_offset"    default="0.0" doc="timestamp (in secs) to be added"/>
    <arg name="max_sync_diff"   default="1.5" doc="max sync diff before publishing"/>
    <arg name="enable_img_node" default="false"/>
+   <arg name="enab_split_node" default="true"/>
    <arg name="metadata"        default=""/>
+
+   <arg name="up_mirror_points_x"     default ="[-0.04, 0.04, 0.04, -0.04]"/>
+   <arg name="up_mirror_points_y"     default ="[-0.051, -0.051, -0.1217, -0.1217]"/>
+   <arg name="up_mirror_points_z"     default ="[0.0, 0.0, 0.0842, 0.0842]"/>
+
+   <arg name="down_mirror_points_x"   default ="[-0.04, 0.04, 0.04, -0.04]"/>
+   <arg name="down_mirror_points_y"   default ="[-0.051, -0.051, -0.1217, -0.1217]"/>
+   <arg name="down_mirror_points_z"   default ="[0.0, 0.0, -0.0842, -0.0842]"/>
 
    <node pkg="ouster_ros" name="os_node" type="os_node" output="screen" required="true">
       <param name="~/lidar_mode"     type="string" value="$(arg lidar_mode)"/>
@@ -26,6 +35,16 @@
       <param name="~/tf_inverse"      value="$(arg tf_inverse)"/>
       <param name="~/stamp_offset"    value="$(arg stamp_offset)"/>
       <param name="~/max_sync_diff"   value="$(arg max_sync_diff)"/>
+
+      <rosparam param="/up_mirror_points_x"   subst_value="True">$(arg up_mirror_points_x)</rosparam>
+      <rosparam param="/up_mirror_points_y"   subst_value="True">$(arg up_mirror_points_y)</rosparam>
+      <rosparam param="/up_mirror_points_z"   subst_value="True">$(arg up_mirror_points_z)</rosparam>
+
+      <rosparam param="/down_mirror_points_x" subst_value="True">$(arg down_mirror_points_x)</rosparam>
+      <rosparam param="/down_mirror_points_y" subst_value="True">$(arg down_mirror_points_y)</rosparam>
+      <rosparam param="/down_mirror_points_z" subst_value="True">$(arg down_mirror_points_z)</rosparam>
+
+
    </node>
 
    <group if="$(arg enable_img_node)">
@@ -34,6 +53,17 @@
       </node>
    </group>
 
-   <node pkg="ouster_ros" name="os_split_cloud_node" type="os_split_cloud_node" output="screen"/>
+   <group if="$(arg enab_split_node)">
+      <node pkg="ouster_ros" name="os_split_cloud_node" type="os_split_cloud_node" output="screen" required="false">
+      
+         <rosparam param="/up_mirror_points_x"   subst_value="True">$(arg up_mirror_points_x)</rosparam>
+         <rosparam param="/up_mirror_points_y"   subst_value="True">$(arg up_mirror_points_y)</rosparam>
+         <rosparam param="/up_mirror_points_z"   subst_value="True">$(arg up_mirror_points_z)</rosparam>
+         <rosparam param="/down_mirror_points_x" subst_value="True">$(arg down_mirror_points_x)</rosparam>
+         <rosparam param="/down_mirror_points_y" subst_value="True">$(arg down_mirror_points_y)</rosparam>
+         <rosparam param="/down_mirror_points_z" subst_value="True">$(arg down_mirror_points_z)</rosparam>
+
+      </node>
+   </group>
 
 </launch>

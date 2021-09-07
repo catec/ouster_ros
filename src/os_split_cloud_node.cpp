@@ -76,15 +76,29 @@ int main(int argc, char** argv)
    ros::init(argc, argv, "os_split_cloud_node");
    ros::NodeHandle nh("~");
 
-   //[[TODO]] Read data as parameters
-   const double mirror_angle      = 50 * M_PI / 180;
-   const double mirror_distance_m = 0.051;  // 0.0525
-   const double w_mirror_m        = 0.080;  // 0.088
-   const double h_mirror_m        = 0.110;  // 0.120
-   //[[]]
+   // //[[TODO]] Read data as parameters
+   // const double mirror_angle      = 50 * M_PI / 180;
+   // const double mirror_distance_m = 0.051;  // 0.0525
+   // const double w_mirror_m        = 0.080;  // 0.088
+   // const double h_mirror_m        = 0.110;  // 0.120
+   // //[[]]
 
-   mirror_markers =
-       std::make_shared<ouster_rviz::MirrorMarkers>(mirror_angle, mirror_distance_m, w_mirror_m, h_mirror_m);
+   XmlRpc::XmlRpcValue up_x, up_y, up_z;
+   nh.param("/up_mirror_points_x", up_x, up_x);
+   nh.param("/up_mirror_points_y", up_y, up_y);
+   nh.param("/up_mirror_points_z", up_z, up_z);
+
+   XmlRpc::XmlRpcValue down_x, down_y, down_z;
+   nh.param("/down_mirror_points_x", down_x, down_x);
+   nh.param("/down_mirror_points_y", down_y, down_y);
+   nh.param("/down_mirror_points_z", down_z, down_z);
+
+   std::vector<Eigen::Vector3d> up_points;
+   std::vector<Eigen::Vector3d> down_points;
+   for (int i = 0; i < up_x.size(); i++) up_points.push_back(Eigen::Vector3d(up_x[i], up_y[i], up_z[i]));
+   for (int i = 0; i < down_x.size(); i++) down_points.push_back(Eigen::Vector3d(down_x[i], down_y[i], down_z[i]));
+
+   mirror_markers = std::make_shared<ouster_rviz::MirrorMarkers>(up_points, down_points);
 
    mirror_markers->computeMirror(ouster_rviz::MirrorType::UP);
    mirror_markers->addCornersMarkers();

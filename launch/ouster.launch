@@ -1,9 +1,9 @@
 <launch>
 
    <!-- Rviz Visualization -->
-   <node pkg="rviz" name="rviz" type="rviz" args="-d $(find ouster_ros)/rviz/config.rviz"/>
+   <!-- <node pkg="rviz" name="rviz" type="rviz" args="-d $(find ouster_ros)/rviz/config.rviz"/> -->
 
-   <arg name="sensor_hostname" default="10.5.0.78" doc="hostname or IP in dotted decimal form of the sensor"/>
+   <arg name="sensor_hostname" default="10.5.0.72" doc="hostname or IP in dotted decimal form of the sensor"/>
    <arg name="udp_dest"        default="10.5.0.1" doc="hostname or IP where the sensor will send data packets"/>
    <arg name="lidar_port"      default="7502" doc="port to which the sensor should send lidar data"/>
    <arg name="imu_port"        default="7503" doc="port to which the sensor should send imu data"/>
@@ -17,13 +17,22 @@
    <arg name="enab_split_node" default="true"/>
    <arg name="metadata"        default=""/>
 
-   <arg name="up_mirror_points_x"     default ="[-0.04, 0.04, 0.04, -0.04]"/>
+   <!-- <arg name="up_mirror_points_x"     default ="[-0.04, 0.04, 0.04, -0.04]"/>
    <arg name="up_mirror_points_y"     default ="[-0.051, -0.051, -0.1217, -0.1217]"/>
    <arg name="up_mirror_points_z"     default ="[0.0, 0.0, 0.0842, 0.0842]"/>
 
    <arg name="down_mirror_points_x"   default ="[-0.04, 0.04, 0.04, -0.04]"/>
    <arg name="down_mirror_points_y"   default ="[-0.051, -0.051, -0.1217, -0.1217]"/>
-   <arg name="down_mirror_points_z"   default ="[0.0, 0.0, -0.0842, -0.0842]"/>
+   <arg name="down_mirror_points_z"   default ="[0.0, 0.0, -0.0842, -0.0842]"/> -->
+
+   <arg name="up_mirror_points_x"     default ="[0.058, 0.058, 0.1477, 0.1477]"/>
+   <arg name="up_mirror_points_y"     default ="[-0.04391, 0.04391, 0.04391, -0.04391]"/>
+   <arg name="up_mirror_points_z"     default ="[0.0, 0.0, 0.0875, 0.0875]"/>
+
+   <arg name="down_mirror_points_x"   default ="[0.058, 0.058, 0.1477, 0.1477]"/>
+   <arg name="down_mirror_points_y"   default ="[-0.04391, 0.04391, 0.04391, -0.04391]"/>
+   <arg name="down_mirror_points_z"   default ="[0.0, 0.0, -0.0875, -0.0875]"/>
+
 
    <node pkg="ouster_ros" name="os_node" type="os_node" output="screen" required="true">
       <param name="~/lidar_mode"     type="string" value="$(arg lidar_mode)"/>

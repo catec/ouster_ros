@@ -45,8 +45,8 @@ XYZLut make_xyz_lut_mirror(LidarScan::index_t w, LidarScan::index_t h, double ra
                            std::vector<Eigen::Vector3d> down_mirror_points)
 {
    // Aproximate mirror interval
-   const double mirror_az_min = 45 * M_PI / 180;
-   const double mirror_az_max = 135 * M_PI / 180;
+   const double mirror_az_min = -45 * M_PI / 180;
+   const double mirror_az_max =  45 * M_PI / 180;
 
    // const double mirror_angle      = 50 * M_PI / 180;
    // const double mirror_distance_m = 0.051;  // 0.0525

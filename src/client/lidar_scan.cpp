@@ -25,16 +25,17 @@ XYZLut make_xyz_lut(LidarScan::index_t w, LidarScan::index_t h, double range_uni
    lut.direction.col(0) = altitude.cos() * azimuth.cos();
    lut.direction.col(1) = -altitude.cos() * azimuth.sin();
    lut.direction.col(2) = altitude.sin();
-   lut.direction *= range_unit;
 
    const double lidar_origin_to_beam_origin_m = lidar_origin_to_beam_origin_mm / 1000.0;
 
    lut.offset        = LidarScan::Points{w * h, 3};
-   lut.offset.col(0) = azimuth.cos() - lut.direction.col(0) * lidar_origin_to_beam_origin_m;
-   lut.offset.col(1) = azimuth.sin() - lut.direction.col(0) * lidar_origin_to_beam_origin_m;
-   lut.offset.col(2) = Eigen::ArrayXd::Zero(w * h);
+   lut.offset.col(0) = azimuth.cos() - lut.direction.col(0);
+   lut.offset.col(1) = - azimuth.sin() - lut.direction.col(1);
+   lut.offset.col(2) = -lut.direction.col(2);               
    lut.offset *= lidar_origin_to_beam_origin_m;
 
+   lut.direction *= range_unit;
+   
    return lut;
 }
 

@@ -5,6 +5,10 @@ sudo systemctl restart ptp4l
 sudo systemctl restart phc2sys
 sudo systemctl restart phc2shm
 
+GREEN='\033[0;32m'
+NC='\033[0m'
+echo -e ${GREEN}"The PTP timer has been resynchronized for the LiDAR." ${NC};
+
 # sudo apt install linuxptp chrony ethtool
 
 # Modify /etc/linuxptp/ptp4l.conf with:

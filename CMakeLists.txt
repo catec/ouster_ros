@@ -26,6 +26,21 @@ find_package(
 set(CMAKE_CXX_STANDARD 14)
 add_compile_options(-Wall -Wextra)
 
+# ==== Build type ====
+SET(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)
+IF(DEFINED CMAKE_BUILD_TYPE)
+  SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES})
+ENDIF()
+
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE "Release")
+ENDIF()
+
+IF(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug" AND
+   NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+  MESSAGE(FATAL_ERROR "Only Release and Debug build types are allowed.")
+ENDIF()
+
 # ==== Catkin ====
 add_message_files(FILES PacketMsg.msg MirrorIndicesMsg.msg)
 generate_messages(DEPENDENCIES std_msgs sensor_msgs geometry_msgs)
@@ -58,7 +73,7 @@ add_library(ouster_ros
   )
 target_link_libraries(
   ouster_ros
-  PUBLIC ${catkin_LIBRARIES})
+  PUBLIC ${catkin_LIBRARIES} jsoncpp)
 set_target_properties(ouster_ros PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(ouster_ros PUBLIC include ${catkin_INCLUDE_DIRS})
 target_compile_options(ouster_ros PRIVATE "$<$<CONFIG:DEBUG>:${FLAGS_DEBUG}>")

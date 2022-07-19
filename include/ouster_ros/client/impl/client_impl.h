@@ -1,6 +1,6 @@
 #pragma once
 
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 
 #include "ouster_ros/client/compat.h"
 #include "stdio.h"

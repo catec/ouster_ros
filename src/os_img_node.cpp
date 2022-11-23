@@ -60,11 +60,16 @@ int main(int argc, char** argv)
    std::string meta_file;
    if (!nh.getParam("metadata", meta_file))
    {
-      ROS_ERROR("Metadata file is not provided");
+      ROS_ERROR("Metadata file is not provided. Finishing.");
       return EXIT_FAILURE;
    }
+
    std::string metadata = read_metadata(meta_file);
-   if (metadata.empty()) return EXIT_FAILURE;
+   if (metadata.empty()) 
+   {
+      ROS_ERROR("Metadata file is not valid. Finishing.");
+      return EXIT_FAILURE;
+   }
 
    auto info = sensor::parse_metadata(metadata);
 

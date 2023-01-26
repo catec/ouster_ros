@@ -14,7 +14,7 @@ MirrorMarkers::MirrorMarkers(const double &mirror_angle, const double &mirror_di
    initializeMarkers();
 }
 
-MirrorMarkers::MirrorMarkers(std::vector<Eigen::Vector3d> &up_points, std::vector<Eigen::Vector3d> &down_points)
+MirrorMarkers::MirrorMarkers(const std::vector<Eigen::Vector3d> &up_points, const std::vector<Eigen::Vector3d> &down_points)
 {
    _up_points       = up_points;
    _down_points     = down_points;

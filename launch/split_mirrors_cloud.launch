@@ -1,0 +1,21 @@
+<launch>
+
+   <!-- Used to publish mirrors markers -->
+   <!-- Hybrid Multisensor mockup Mirror Points -->
+   <arg name="up_mirror_points_x"     default ="[0.058, 0.058, 0.1477, 0.1477]"/>
+   <arg name="up_mirror_points_y"     default ="[-0.04391, 0.04391, 0.04391, -0.04391]"/>
+   <arg name="up_mirror_points_z"     default ="[0.0, 0.0, 0.0875, 0.0875]"/>
+
+   <arg name="down_mirror_points_x"   default ="[0.058, 0.058, 0.1477, 0.1477]"/>
+   <arg name="down_mirror_points_y"   default ="[-0.04391, 0.04391, 0.04391, -0.04391]"/>
+   <arg name="down_mirror_points_z"   default ="[0.0, 0.0, -0.0875, -0.0875]"/>
+
+    <node pkg="ouster_ros" name="os_split_cloud_node" type="os_split_cloud_node" output="screen" required="false">
+        <rosparam param="/up_mirror_points_x"   subst_value="True">$(arg up_mirror_points_x)</rosparam>
+        <rosparam param="/up_mirror_points_y"   subst_value="True">$(arg up_mirror_points_y)</rosparam>
+        <rosparam param="/up_mirror_points_z"   subst_value="True">$(arg up_mirror_points_z)</rosparam>
+        <rosparam param="/down_mirror_points_x" subst_value="True">$(arg down_mirror_points_x)</rosparam>
+        <rosparam param="/down_mirror_points_y" subst_value="True">$(arg down_mirror_points_y)</rosparam>
+        <rosparam param="/down_mirror_points_z" subst_value="True">$(arg down_mirror_points_z)</rosparam>
+    </node>
+</launch>

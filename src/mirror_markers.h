@@ -16,7 +16,7 @@ class MirrorMarkers
   public:
    MirrorMarkers(const double &mirror_angle, const double &mirror_distance_m, const double &w_mirror_m,
                  const double &h_mirror_m);
-   MirrorMarkers(std::vector<Eigen::Vector3d> &up_points, std::vector<Eigen::Vector3d> &down_points);
+   MirrorMarkers(const std::vector<Eigen::Vector3d> &up_points, const std::vector<Eigen::Vector3d> &down_points);
 
    virtual ~MirrorMarkers();
 
